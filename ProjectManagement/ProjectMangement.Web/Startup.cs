@@ -17,6 +17,7 @@ namespace ProjectMangement.Web
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddHttpContextAccessor();
+            services.AddHttpClient();
             services.AddControllersWithViews();
         }
 
@@ -31,11 +32,6 @@ namespace ProjectMangement.Web
             app.UseStaticFiles();
 
             app.UseRouting();
-
-            app.UseCors(x => x
-            .AllowAnyOrigin()
-            .AllowAnyMethod()
-            .AllowAnyHeader());
 
             app.UseEndpoints(endpoints =>
             {
