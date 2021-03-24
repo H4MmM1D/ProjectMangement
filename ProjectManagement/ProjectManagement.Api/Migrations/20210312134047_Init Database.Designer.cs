@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ProjectManagement.Api.Data;
 
 namespace ProjectManagement.Api.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210312134047_Init Database")]
+    partial class InitDatabase
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -55,7 +57,7 @@ namespace ProjectManagement.Api.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("UniqueIdentifier");
 
-                    b.Property<Guid?>("Assigny")
+                    b.Property<Guid>("Assigny")
                         .HasColumnType("UniqueIdentifier");
 
                     b.Property<DateTime>("CreationDate")
@@ -71,13 +73,9 @@ namespace ProjectManagement.Api.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<byte>("Priority")
-                        .HasColumnType("tinyint");
-
-                    b.Property<Guid?>("ProjectId")
+                    b.Property<Guid>("ProjectId")
                         .HasColumnType("UniqueIdentifier");
 
                     b.Property<DateTime>("StartDate")
@@ -128,11 +126,15 @@ namespace ProjectManagement.Api.Migrations
                 {
                     b.HasOne("ProjectManagement.Api.Business.User", "User")
                         .WithMany("Tasks")
-                        .HasForeignKey("Assigny");
+                        .HasForeignKey("Assigny")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("ProjectManagement.Api.Business.Project", "Project")
                         .WithMany("Tasks")
-                        .HasForeignKey("ProjectId");
+                        .HasForeignKey("ProjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

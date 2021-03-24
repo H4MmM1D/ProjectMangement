@@ -6,6 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using ProjectManagement.Api.Data;
+using ProjectManagement.Api.Mapper;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,17 +26,47 @@ namespace ProjectManagement.Api
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddCors();
+            services.AddSwaggerGen();
             services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+
+            services.AddSwaggerGen(options =>
+            {
+                options.SwaggerDoc("ProjectOpenApi", new Microsoft.OpenApi.Models.OpenApiInfo
+                {
+                    Title = "Project API",
+                    Version = "1",
+                    Description = "Project API"
+                });
+            });
+
+            services.AddSwaggerGen(options =>
+            {
+                options.SwaggerDoc("TaskOpenApi", new Microsoft.OpenApi.Models.OpenApiInfo
+                {
+                    Title = "Task API",
+                    Version = "1",
+                    Description = "Task API"
+                });
+            });
+
+            services.AddAutoMapper(typeof(Mappings));
             services.AddControllers();
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
+
+            app.UseSwagger();
+            app.UseSwaggerUI(options =>
+            {
+                options.SwaggerEndpoint("/swagger/ProjectOpenApi/swagger.json", "Project API");
+                options.SwaggerEndpoint("/swagger/TaskOpenApi/swagger.json", "Task API");
+                options.RoutePrefix = "";
+            });
 
             app.UseRouting();
             app.UseCors(x => x
