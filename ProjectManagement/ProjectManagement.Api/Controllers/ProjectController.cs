@@ -1,10 +1,12 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using ProjectManagement.Api.Business;
 using ProjectManagement.Api.Business.Dtos;
 using ProjectManagement.Api.Data;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace ProjectManagement.Api.Controllers
@@ -28,33 +30,48 @@ namespace ProjectManagement.Api.Controllers
         [HttpGet("{projectId:Guid}", Name = "GetProject")]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesDefaultResponseType]
-        public IActionResult Get(Guid projectId) 
+        public IActionResult Get(Guid projectId)
         {
             var project = _db.Projects.FirstOrDefault(x => x.Id == projectId);
 
-            if (project == null) 
+            if (project == null)
             {
                 return NotFound();
             }
-                
+
             var projectDto = _mapper.Map<ProjectDto>(project);
 
             return Ok(projectDto);
+        }
+
+        [HttpGet("[action]")]
+        [ProducesResponseType(200, Type = typeof(List<ProjectDto>))]
+        public IActionResult GetAllProjects() 
+        {
+            var projects = _db.Projects.OrderByDescending(x => x.CreationDate).ToList();
+            var projectDtos = new List<ProjectDto>();
+
+            foreach (var item in projects)
+            {
+                projectDtos.Add(_mapper.Map<ProjectDto>(item));
+            }
+
+            return Ok(projectDtos);
         }
 
         [HttpPost("[action]")]
         [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(CreateProjectDto))]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
         [ProducesDefaultResponseType]
-        public IActionResult AddProject([FromBody] CreateProjectDto projectDto) 
+        public IActionResult AddProject([FromBody] CreateProjectDto projectDto)
         {
-            if (projectDto == null || !ModelState.IsValid) 
+            if (projectDto == null || !ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
             var projectExists = _db.Projects.Any(x => x.Name == projectDto.Name);
-            if (projectExists) 
+            if (projectExists)
             {
                 ModelState.AddModelError("", "نام پروژه تکراری می باشد.");
                 return StatusCode(409, ModelState);
@@ -79,7 +96,7 @@ namespace ProjectManagement.Api.Controllers
         [HttpPut("[action]/{projectId}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public IActionResult UpdateProject(Guid projectId, [FromBody] EditProjectDto projectDto) 
+        public IActionResult UpdateProject(Guid projectId, [FromBody] EditProjectDto projectDto)
         {
             if (projectDto == null || projectId != projectDto.Id || !ModelState.IsValid)
             {
@@ -102,20 +119,60 @@ namespace ProjectManagement.Api.Controllers
             return NoContent();
         }
 
+        [HttpDelete("[action]/{projectId:Guid}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        public IActionResult DeleteProject(Guid projectId)
+        {
+            var project = _db.Projects.Include(x => x.Tasks).SingleOrDefault(x => x.Id == projectId);
+
+            if (project == null)
+            {
+                return NotFound();
+            }
+            try
+            {
+                _db.Database.BeginTransaction();
+
+                if (project.Tasks.Any())
+                {
+                    foreach (var item in project.Tasks)
+                    {
+                        item.ProjectId = null;
+                    }
+
+                    _db.Tasks.UpdateRange(project.Tasks);
+                    _db.SaveChanges();
+                }
+
+                _db.Projects.Remove(project);
+                _db.SaveChanges();
+
+                _db.Database.CommitTransaction();
+            }
+            catch (Exception ex)
+            {
+                _db.Database.RollbackTransaction();
+                ModelState.AddModelError("", ex.Message);
+                return StatusCode(500, ModelState);
+            }
+
+            return NoContent();
+        }
+
 
         [HttpPatch("[action]/{projectId:Guid}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public IActionResult SetProjectEstiamtedTime(Guid projectId, [FromBody] SetEstimatedDeliveryDto projectDto) 
+        public IActionResult SetProjectEstiamtedTime(Guid projectId, [FromBody] SetEstimatedDeliveryDto projectDto)
         {
-            if (projectDto == null || projectId != projectDto.Id) 
+            if (projectDto == null || projectId != projectDto.Id)
             {
                 return BadRequest(ModelState);
             }
 
             var project = _db.Projects.FirstOrDefault(x => x.Id == projectId);
 
-            if (project == null) 
+            if (project == null)
             {
                 return NotFound();
             }

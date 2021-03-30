@@ -19,6 +19,7 @@ namespace ProjectManagement.Api.Data
 
         public DbSet<Project> Projects { get; set; }
         public DbSet<Task> Tasks { get; set; }
+        public DbSet<User> Users { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -39,7 +40,7 @@ namespace ProjectManagement.Api.Data
          .WithMany(u => u.Tasks)
          .HasForeignKey(t => t.Assigny);
 
-            //This is for seeding initail data
+            //This is for seeding initial data
             //modelBuilder.Entity<Project>().HasData(
             //    new Project
             //    {
