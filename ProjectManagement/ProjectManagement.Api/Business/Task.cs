@@ -27,6 +27,7 @@ namespace ProjectManagement.Api.Business
         public Priority Priority { get; set; }
 
         public Project Project { get; set; }
+
         public User User { get; set; }
     }
 }

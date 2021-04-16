@@ -13,16 +13,24 @@ namespace ProjectManagement.Api.Business.Dtos
         public Guid? ProjectId { get; set; }
         public Guid? Assigny { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "عنوان تسک می بایست مشخص گردد")]
         public string Name { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "تاریخ شروع تسک می بایست مشخص گردد.")]
         public DateTime StartDate { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "تاریخ پایان پروژه می بایست مشخص گردد.")]
         public DateTime EndDate { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "اولویت تسک می بایست مشخص گردد.")]
+        public Priority Priority { get; set; }
+    }
+
+    public class SetTaskPriorityDto
+    {
+        public Guid Id { get; set; }
+
+        [Required(ErrorMessage = "اولویت تسک می بایست مشخص گردد.")]
         public Priority Priority { get; set; }
     }
 }

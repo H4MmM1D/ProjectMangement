@@ -4,14 +4,11 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace ProjectManagement.Api.Business
+namespace ProjectManagement.Api.Business.Dtos
 {
-    public class User : EntityBase
+    public class EditUserDto
     {
-        public User() : base()
-        {
-
-        }
+        public Guid Id { get; set; }
 
         [Required(ErrorMessage = "عنوان کاربر می بایست وارد شود.")]
         public string UserTitle { get; set; }
@@ -25,11 +22,5 @@ namespace ProjectManagement.Api.Business
         [Required(ErrorMessage = "ایمیل می بایست وارد شود.")]
         [EmailAddress(ErrorMessage = "ایمیل وارد شده معتبر نمی باشد")]
         public string Email { get; set; }
-
-        public virtual List<UserRole> UserRoles { get; set; }
-
-        public virtual List<UserPrivilegeLevel> UserPrivilegeLevels { get; set; }
-
-        public virtual List<Task> Tasks { get; set; }
     }
 }

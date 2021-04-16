@@ -16,5 +16,8 @@ namespace ProjectManagement.Api.Business.Dtos
 
         [Required(ErrorMessage = "تاریخ پایان می بایست وارد شود.")]
         public DateTime Deadline { get; set; }
+
+        [Required(ErrorMessage = "اولویت پروژه می بایست مشخص گردد.")]
+        public Priority Priority { get; set; }
     }
 }

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using ProjectManagement.Api.Business;
 using ProjectManagement.Api.Business.Dtos;
 using ProjectManagement.Api.Data;
+using ProjectManagement.Api.Models.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -60,11 +61,11 @@ namespace ProjectManagement.Api.Controllers
 
         [HttpGet("[action]/{projectId:Guid}")]
         [ProducesResponseType(200, Type = typeof(List<TaskDto>))]
-        public IActionResult GetProjectTasks(Guid projectId) 
+        public IActionResult GetProjectTasks(Guid projectId)
         {
             var project = _db.Projects.SingleOrDefault(x => x.Id == projectId);
 
-            if (project == null) 
+            if (project == null)
             {
                 return NotFound();
             }
@@ -86,12 +87,28 @@ namespace ProjectManagement.Api.Controllers
         [ProducesDefaultResponseType]
         public IActionResult AddTask([FromBody] CreateTaskDto taskDto)
         {
-            if (taskDto == null)
+            if (taskDto == null || !ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
+            if (!Enum.IsDefined(typeof(Priority), taskDto.Priority))
+            {
+                ModelState.AddModelError("", "اولویت تسک مشخص نشده است.");
+                return StatusCode(400, ModelState);
+            }
+
+            if (taskDto.ProjectId != null)
+            {
+                var projectExists = _db.Projects.Any(x => x.Id == taskDto.ProjectId);
+                if (!projectExists)
+                {
+                    return NotFound("پروژه یافت نشد.");
+                }
+            }
+
             var taskExists = _db.Tasks.Any(x => x.Name == taskDto.Name);
+
             if (taskExists)
             {
                 ModelState.AddModelError("", "نام تسک تکراری می باشد.");
@@ -111,7 +128,9 @@ namespace ProjectManagement.Api.Controllers
                 return StatusCode(500, ModelState);
             }
 
-            return CreatedAtRoute("GetTask", new { taskId = task.Id }, task);
+            var taskResult = _mapper.Map<TaskDto>(task);
+
+            return CreatedAtRoute("GetTask", new { taskId = task.Id }, taskResult);
         }
 
         [HttpPut("[action]/{taskId:Guid}")]
@@ -122,6 +141,28 @@ namespace ProjectManagement.Api.Controllers
             if (taskDto == null || taskId != taskDto.Id)
             {
                 return BadRequest(ModelState);
+            }
+
+            var taskExists = _db.Tasks.Any(x => x.Id == taskId);
+
+            if (!taskExists)
+                return NotFound("تسک یافت نشد.");
+
+            var taskNameExists = _db.Tasks.Any(x => x.Id != taskDto.Id && x.Name == taskDto.Name);
+
+            if (taskNameExists)
+            {
+                ModelState.AddModelError("", "نام تسک تکراری می باشد.");
+                return StatusCode(409, ModelState);
+            }
+
+            if (taskDto.ProjectId != null)
+            {
+                var projectExists = _db.Projects.Any(x => x.Id == taskDto.ProjectId);
+                if (!projectExists)
+                {
+                    return NotFound("پروژه یافت نشد.");
+                }
             }
 
             var task = _mapper.Map<Task>(taskDto);
@@ -140,15 +181,40 @@ namespace ProjectManagement.Api.Controllers
             return NoContent();
         }
 
+        [HttpDelete("[action]/{taskId:Guid}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public IActionResult DeleteTask(Guid taskId)
+        {
+            var task = _db.Tasks.SingleOrDefault(x => x.Id == taskId);
+
+            if (task == null)
+            {
+                return NotFound("تسکی یافت نشد.");
+            }
+            try
+            {
+                _db.Tasks.Remove(task);
+                _db.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", ex.Message);
+                return StatusCode(500, ModelState);
+            }
+
+            return NoContent();
+        }
+
         [HttpPatch("[action]/{projectId:Guid}/{taskId:Guid}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public IActionResult AssignTaskToProject(Guid projectId, Guid taskId) 
+        public IActionResult AssignTaskToProject(Guid projectId, Guid taskId)
         {
             var task = _db.Tasks.SingleOrDefault(x => x.Id == taskId);
             var project = _db.Projects.SingleOrDefault(x => x.Id == projectId);
 
-            if (task == null || project == null) 
+            if (task == null || project == null)
             {
                 return NotFound();
             }
@@ -184,6 +250,38 @@ namespace ProjectManagement.Api.Controllers
             try
             {
                 task.Assigny = userId;
+                _db.Tasks.Update(task);
+                _db.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", ex.Message);
+                return StatusCode(500, ModelState);
+            }
+
+            return NoContent();
+        }
+
+        [HttpPatch("[action]/{taskId:Guid}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public IActionResult SetTaskPriority(Guid taskId, [FromBody] SetTaskPriorityDto taskDto)
+        {
+            if (taskDto == null || taskId != taskDto.Id || !ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var task = _db.Tasks.FirstOrDefault(x => x.Id == taskId);
+
+            if (task == null)
+            {
+                return NotFound();
+            }
+
+            try
+            {
+                task.Priority = taskDto.Priority;
                 _db.Tasks.Update(task);
                 _db.SaveChanges();
             }

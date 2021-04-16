@@ -49,6 +49,16 @@ namespace ProjectManagement.Api
                 });
             });
 
+            services.AddSwaggerGen(options =>
+            {
+                options.SwaggerDoc("UserOpenApi", new Microsoft.OpenApi.Models.OpenApiInfo
+                {
+                    Title = "User API",
+                    Version = "1",
+                    Description = "User API"
+                });
+            });
+
             services.AddAutoMapper(typeof(Mappings));
             services.AddControllers();
         }
@@ -65,6 +75,7 @@ namespace ProjectManagement.Api
             {
                 options.SwaggerEndpoint("/swagger/ProjectOpenApi/swagger.json", "Project API");
                 options.SwaggerEndpoint("/swagger/TaskOpenApi/swagger.json", "Task API");
+                options.SwaggerEndpoint("/swagger/UserOpenApi/swagger.json", "User API");
                 options.RoutePrefix = "";
             });
 

@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ProjectManagement.Api.Data;
 
 namespace ProjectManagement.Api.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210416172446_AddUserRoleAndUserPrivilegeLevel")]
+    partial class AddUserRoleAndUserPrivilegeLevel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -41,16 +43,6 @@ namespace ProjectManagement.Api.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("PrivilegeLevels");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("b2ae4957-0693-42ed-beb7-3af378d5d370"),
-                            CreationDate = new DateTime(2021, 4, 16, 22, 31, 39, 244, DateTimeKind.Local).AddTicks(8139),
-                            LastModifiedDate = new DateTime(2021, 4, 16, 22, 31, 39, 244, DateTimeKind.Local).AddTicks(8236),
-                            ModifiedBy = "Admin",
-                            PrivilegeLevelTitle = "Level 1"
-                        });
                 });
 
             modelBuilder.Entity("ProjectManagement.Api.Business.Project", b =>
@@ -108,16 +100,6 @@ namespace ProjectManagement.Api.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Roles");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("11efb2df-6c8d-4c6e-8c19-a84ebd0a6b51"),
-                            CreationDate = new DateTime(2021, 4, 16, 22, 31, 39, 208, DateTimeKind.Local).AddTicks(2446),
-                            LastModifiedDate = new DateTime(2021, 4, 16, 22, 31, 39, 241, DateTimeKind.Local).AddTicks(8702),
-                            ModifiedBy = "Admin",
-                            RoleTitle = "Admin"
-                        });
                 });
 
             modelBuilder.Entity("ProjectManagement.Api.Business.Task", b =>

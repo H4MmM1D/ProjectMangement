@@ -16,7 +16,9 @@ namespace ProjectManagement.Api.Mapper
             CreateMap<Task, CreateTaskDto>().ReverseMap();
             CreateMap<Task, EditTaskDto>().ReverseMap();
 
-            CreateMap<Task, TaskDto>().ReverseMap();
+            CreateMap<User, UserDto>().ReverseMap();
+            CreateMap<User, CreateUserDto>().ReverseMap();
+            CreateMap<User, EditUserDto>().ReverseMap();
         }
     }
 }

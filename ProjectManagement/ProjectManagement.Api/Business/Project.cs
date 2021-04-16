@@ -21,6 +21,9 @@ namespace ProjectManagement.Api.Business
         [Required]
         public DateTime Deadline { get; set; }
 
+        [Required]
+        public Priority Priority { get; set; }
+
         public virtual List<Task> Tasks { get; set; }
     }
 }

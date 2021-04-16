@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using ProjectManagement.Api.Business;
 using ProjectManagement.Api.Business.Dtos;
 using ProjectManagement.Api.Data;
+using ProjectManagement.Api.Models.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,11 +33,11 @@ namespace ProjectManagement.Api.Controllers
         [ProducesDefaultResponseType]
         public IActionResult Get(Guid projectId)
         {
-            var project = _db.Projects.FirstOrDefault(x => x.Id == projectId);
+            var project = _db.Projects.SingleOrDefault(x => x.Id == projectId);
 
             if (project == null)
             {
-                return NotFound();
+                return NotFound("پروژه ای یاقت نشد.");
             }
 
             var projectDto = _mapper.Map<ProjectDto>(project);
@@ -46,7 +47,7 @@ namespace ProjectManagement.Api.Controllers
 
         [HttpGet("[action]")]
         [ProducesResponseType(200, Type = typeof(List<ProjectDto>))]
-        public IActionResult GetAllProjects() 
+        public IActionResult GetAllProjects()
         {
             var projects = _db.Projects.OrderByDescending(x => x.CreationDate).ToList();
             var projectDtos = new List<ProjectDto>();
@@ -60,7 +61,7 @@ namespace ProjectManagement.Api.Controllers
         }
 
         [HttpPost("[action]")]
-        [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(CreateProjectDto))]
+        [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(ProjectDto))]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
         [ProducesDefaultResponseType]
         public IActionResult AddProject([FromBody] CreateProjectDto projectDto)
@@ -68,6 +69,12 @@ namespace ProjectManagement.Api.Controllers
             if (projectDto == null || !ModelState.IsValid)
             {
                 return BadRequest(ModelState);
+            }
+
+            if (!Enum.IsDefined(typeof(Priority), projectDto.Priority))
+            {
+                ModelState.AddModelError("", "اولویت پروژه مشخص نشده است.");
+                return StatusCode(400, ModelState);
             }
 
             var projectExists = _db.Projects.Any(x => x.Name == projectDto.Name);
@@ -90,7 +97,9 @@ namespace ProjectManagement.Api.Controllers
                 return StatusCode(500, ModelState);
             }
 
-            return CreatedAtRoute("GetProject", new { projectId = project.Id }, project);
+            var projectResult = _mapper.Map<ProjectDto>(project);
+
+            return CreatedAtRoute("GetProject", new { projectId = project.Id }, projectResult);
         }
 
         [HttpPut("[action]/{projectId}")]
@@ -101,6 +110,25 @@ namespace ProjectManagement.Api.Controllers
             if (projectDto == null || projectId != projectDto.Id || !ModelState.IsValid)
             {
                 return BadRequest(ModelState);
+            }
+
+            var projectExists = _db.Projects.Any(x => x.Id == projectId);
+
+            if (!projectExists)
+                return NotFound("پروژه یافت نشد.");
+
+            var projectNameExists = _db.Projects.Any(x => x.Id != projectDto.Id && x.Name == projectDto.Name);
+
+            if (projectNameExists)
+            {
+                ModelState.AddModelError("", "نام پروژه تکراری می باشد.");
+                return StatusCode(409, ModelState);
+            }
+
+            if (!Enum.IsDefined(typeof(Priority), projectDto.Priority))
+            {
+                ModelState.AddModelError("", "اولویت پروژه مشخص نشده است.");
+                return StatusCode(400, ModelState);
             }
 
             var project = _mapper.Map<Project>(projectDto);
@@ -121,13 +149,14 @@ namespace ProjectManagement.Api.Controllers
 
         [HttpDelete("[action]/{projectId:Guid}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public IActionResult DeleteProject(Guid projectId)
         {
             var project = _db.Projects.Include(x => x.Tasks).SingleOrDefault(x => x.Id == projectId);
 
             if (project == null)
             {
-                return NotFound();
+                return NotFound("پروژه ای یافت نشد.");
             }
             try
             {
@@ -165,7 +194,7 @@ namespace ProjectManagement.Api.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public IActionResult SetProjectEstiamtedTime(Guid projectId, [FromBody] SetEstimatedDeliveryDto projectDto)
         {
-            if (projectDto == null || projectId != projectDto.Id)
+            if (projectDto == null || projectId != projectDto.Id || !ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
@@ -180,6 +209,38 @@ namespace ProjectManagement.Api.Controllers
             try
             {
                 project.EstimatedDelivery = projectDto.EstimatedDelivery;
+                _db.Projects.Update(project);
+                _db.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", ex.Message);
+                return StatusCode(500, ModelState);
+            }
+
+            return NoContent();
+        }
+
+        [HttpPatch("[action]/{projectId:Guid}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public IActionResult SetProjectPriority(Guid projectId, [FromBody] SetProjectPriorityDto projectDto)
+        {
+            if (projectDto == null || projectId != projectDto.Id || !ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var project = _db.Projects.FirstOrDefault(x => x.Id == projectId);
+
+            if (project == null)
+            {
+                return NotFound();
+            }
+
+            try
+            {
+                project.Priority = projectDto.Priority;
                 _db.Projects.Update(project);
                 _db.SaveChanges();
             }
