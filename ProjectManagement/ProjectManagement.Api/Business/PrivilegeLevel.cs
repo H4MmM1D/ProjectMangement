@@ -17,5 +17,7 @@ namespace ProjectManagement.Api.Business
         public string PrivilegeLevelTitle { get; set; }
 
         public virtual List<UserPrivilegeLevel> UserPrivilegeLevels { get; set; }
+
+        public virtual List<MemberPrivilegeLevel> MemberPrivilegeLevels { get; set; }
     }
 }

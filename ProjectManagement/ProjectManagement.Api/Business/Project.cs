@@ -13,12 +13,12 @@ namespace ProjectManagement.Api.Business
 
         }
 
-        [Required]
+        [Required(ErrorMessage = "عنوان پروژه می بایست وارد شود.")]
         public string Name { get; set; }
 
         public DateTime EstimatedDelivery { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "تاریخ موعد تحویل می بایست مشخص گردد.")]
         public DateTime Deadline { get; set; }
 
         [Required]

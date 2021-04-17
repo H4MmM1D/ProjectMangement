@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace ProjectManagement.Api.Business.Dtos
+namespace ProjectManagement.Api.Business.Dtos.Task
 {
     public class CreateTaskDto
     {

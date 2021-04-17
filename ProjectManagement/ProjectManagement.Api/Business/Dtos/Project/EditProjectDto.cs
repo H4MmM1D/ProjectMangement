@@ -5,10 +5,12 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace ProjectManagement.Api.Business.Dtos
+namespace ProjectManagement.Api.Business.Dtos.Project
 {
-    public class CreateProjectDto
+    public class EditProjectDto
     {
+        public Guid Id { get; set; }
+
         [Required(ErrorMessage = "نام پروژه اجباری می باشد.")]
         public string Name { get; set; }
 
@@ -16,6 +18,22 @@ namespace ProjectManagement.Api.Business.Dtos
 
         [Required(ErrorMessage = "تاریخ پایان می بایست وارد شود.")]
         public DateTime Deadline { get; set; }
+
+        [Required(ErrorMessage = "اولویت پروژه می بایست مشخص گردد.")]
+        public Priority Priority { get; set; }
+    }
+
+    public class SetEstimatedDeliveryDto
+    {
+        public Guid Id { get; set; }
+
+        [Required(ErrorMessage = "تاریخ تحویل مشخص نشده است.")]
+        public DateTime EstimatedDelivery { get; set; }
+    }
+
+    public class SetProjectPriorityDto
+    {
+        public Guid Id { get; set; }
 
         [Required(ErrorMessage = "اولویت پروژه می بایست مشخص گردد.")]
         public Priority Priority { get; set; }

@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using ProjectManagement.Api.Business;
-using ProjectManagement.Api.Business.Dtos;
+using ProjectManagement.Api.Business.Dtos.User;
 using ProjectManagement.Api.Data;
 using ProjectManagement.Api.Security;
 using System;
@@ -83,7 +83,15 @@ namespace ProjectManagement.Api.Controllers
 
             if (usernameExists)
             {
-                ModelState.AddModelError("Email", "نام کاربری قبلا استفاده شده است.");
+                ModelState.AddModelError("Username", "نام کاربری قبلا استفاده شده است.");
+                return StatusCode(409, ModelState);
+            }
+
+            var userTitleExists = _db.Users.Any(x => x.UserTitle == userDto.UserTitle);
+
+            if (userTitleExists)
+            {
+                ModelState.AddModelError("UserTitle", "عنوان کاربری قبلا استفاده شده است.");
                 return StatusCode(409, ModelState);
             }
 

@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ProjectManagement.Api.Business;
-using ProjectManagement.Api.Business.Dtos;
+using ProjectManagement.Api.Business.Dtos.Project;
 using ProjectManagement.Api.Data;
 using ProjectManagement.Api.Models.Enums;
 using System;

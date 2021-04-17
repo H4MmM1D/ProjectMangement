@@ -19,5 +19,7 @@ namespace ProjectManagement.Api.Business
 
         public virtual List<UserRole> UserRoles { get; set; }
 
+        public virtual List<MemberRole> MemberRoles { get; set; }
+
     }
 }

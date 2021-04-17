@@ -1,6 +1,10 @@
 ﻿using AutoMapper;
 using ProjectManagement.Api.Business;
-using ProjectManagement.Api.Business.Dtos;
+using ProjectManagement.Api.Business.Dtos.Meeting;
+using ProjectManagement.Api.Business.Dtos.Member;
+using ProjectManagement.Api.Business.Dtos.Project;
+using ProjectManagement.Api.Business.Dtos.Task;
+using ProjectManagement.Api.Business.Dtos.User;
 
 namespace ProjectManagement.Api.Mapper
 {
@@ -19,6 +23,14 @@ namespace ProjectManagement.Api.Mapper
             CreateMap<User, UserDto>().ReverseMap();
             CreateMap<User, CreateUserDto>().ReverseMap();
             CreateMap<User, EditUserDto>().ReverseMap();
+
+            CreateMap<Member, MemberDto>().ReverseMap();
+            CreateMap<Member, CreateMemberDto>().ReverseMap();
+            CreateMap<Member, EditMemberDto>().ReverseMap();
+
+            CreateMap<Meeting, MeetingDto>().ReverseMap();
+            CreateMap<Meeting, CreateMeetingDto>().ReverseMap();
+            CreateMap<Meeting, EditMeetingDto>().ReverseMap();
         }
     }
 }

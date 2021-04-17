@@ -59,6 +59,26 @@ namespace ProjectManagement.Api
                 });
             });
 
+            services.AddSwaggerGen(options =>
+            {
+                options.SwaggerDoc("MemberOpenApi", new Microsoft.OpenApi.Models.OpenApiInfo
+                {
+                    Title = "Member API",
+                    Version = "1",
+                    Description = "Member API"
+                });
+            });
+
+            services.AddSwaggerGen(options =>
+            {
+                options.SwaggerDoc("MeetingOpenApi", new Microsoft.OpenApi.Models.OpenApiInfo
+                {
+                    Title = "Meeting API",
+                    Version = "1",
+                    Description = "Meeting API"
+                });
+            });
+
             services.AddAutoMapper(typeof(Mappings));
             services.AddControllers();
         }
@@ -76,6 +96,8 @@ namespace ProjectManagement.Api
                 options.SwaggerEndpoint("/swagger/ProjectOpenApi/swagger.json", "Project API");
                 options.SwaggerEndpoint("/swagger/TaskOpenApi/swagger.json", "Task API");
                 options.SwaggerEndpoint("/swagger/UserOpenApi/swagger.json", "User API");
+                options.SwaggerEndpoint("/swagger/MemberOpenApi/swagger.json", "Member API");
+                options.SwaggerEndpoint("/swagger/MeetingOpenApi/swagger.json", "Meeting API");
                 options.RoutePrefix = "";
             });
 

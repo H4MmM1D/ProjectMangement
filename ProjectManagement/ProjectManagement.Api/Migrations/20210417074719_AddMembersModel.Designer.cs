@@ -3,54 +3,23 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ProjectManagement.Api.Data;
 
 namespace ProjectManagement.Api.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210417074719_AddMembersModel")]
+    partial class AddMembersModel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "3.1.12")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-            modelBuilder.Entity("ProjectManagement.Api.Business.Meeting", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("UniqueIdentifier");
-
-                    b.Property<DateTime>("CreationDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("EndData")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("LastModifiedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("ModifiedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Report")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("StartDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Meetings");
-                });
 
             modelBuilder.Entity("ProjectManagement.Api.Business.Member", b =>
                 {
@@ -85,7 +54,7 @@ namespace ProjectManagement.Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Members");
+                    b.ToTable("Member");
                 });
 
             modelBuilder.Entity("ProjectManagement.Api.Business.MemberPrivilegeLevel", b =>
@@ -112,7 +81,7 @@ namespace ProjectManagement.Api.Migrations
 
                     b.HasIndex("MemberId");
 
-                    b.ToTable("MemberPrivilegeLevels");
+                    b.ToTable("MemberPrivilegeLevel");
                 });
 
             modelBuilder.Entity("ProjectManagement.Api.Business.MemberRole", b =>
@@ -139,7 +108,7 @@ namespace ProjectManagement.Api.Migrations
 
                     b.HasIndex("MemberId");
 
-                    b.ToTable("MemberRoles");
+                    b.ToTable("MemberRole");
                 });
 
             modelBuilder.Entity("ProjectManagement.Api.Business.PrivilegeLevel", b =>

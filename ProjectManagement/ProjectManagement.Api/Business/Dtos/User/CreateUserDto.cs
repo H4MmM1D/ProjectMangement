@@ -4,12 +4,10 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace ProjectManagement.Api.Business.Dtos
+namespace ProjectManagement.Api.Business.Dtos.User
 {
-    public class EditUserDto
+    public class CreateUserDto
     {
-        public Guid Id { get; set; }
-
         [Required(ErrorMessage = "عنوان کاربر می بایست وارد شود.")]
         public string UserTitle { get; set; }
 

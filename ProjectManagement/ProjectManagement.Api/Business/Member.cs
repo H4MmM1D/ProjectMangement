@@ -4,14 +4,19 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace ProjectManagement.Api.Business.Dtos
+namespace ProjectManagement.Api.Business
 {
-    public class CreateUserDto
+    public class Member : EntityBase
     {
-        [Required(ErrorMessage = "عنوان کاربر می بایست وارد شود.")]
-        public string UserTitle { get; set; }
+        public Member() : base() 
+        {
 
-        [Required(ErrorMessage = "نام کاربری می بایست وارد شود.")]
+        }
+
+        [Required(ErrorMessage = "عنوان اعضا می بایست وارد شود.")]
+        public string MemberTitle { get; set; }
+
+        [Required(ErrorMessage = "نام اعضا می بایست وارد شود.")]
         public string Username { get; set; }
 
         [Required(ErrorMessage = "کلمه عبور می بایست وارد شود.")]
@@ -20,5 +25,9 @@ namespace ProjectManagement.Api.Business.Dtos
         [Required(ErrorMessage = "ایمیل می بایست وارد شود.")]
         [EmailAddress(ErrorMessage = "ایمیل وارد شده معتبر نمی باشد")]
         public string Email { get; set; }
+
+        public virtual List<MemberRole> MemberRoles { get; set; }
+
+        public virtual List<MemberPrivilegeLevel> MemberPrivilegeLevels { get; set; }
     }
 }
